@@ -1,0 +1,5 @@
+ALTER TABLE users
+    ADD COLUMN blocked BOOLEAN NOT NULL DEFAULT FALSE,
+    ADD COLUMN blocked_reason TEXT,
+    ADD COLUMN blocked_at TIMESTAMPTZ,
+    ADD COLUMN blocked_by BIGINT REFERENCES users (id);

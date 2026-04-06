@@ -1,0 +1,82 @@
+spring:
+  application:
+    name: peer-lending
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:peerlending}
+    username: ${DB_USER:peerlending}
+    password: ${DB_PASSWORD:peerlending}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID:github-not-configured}
+            client-secret: ${GITHUB_CLIENT_SECRET:github-not-configured}
+            scope: read:user,user:email
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:google-not-configured}
+            client-secret: ${GOOGLE_CLIENT_SECRET:google-not-configured}
+            scope:
+              - openid
+              - profile
+              - email
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: login
+  # Учётные данные — из SPRING_MAIL_* (.env / Docker). Обязательно STARTTLS для Gmail (порт 587).
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  # So redirect_uri for GitHub matches the public URL when nginx sets X-Forwarded-* headers
+  forward-headers-strategy: framework
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+    access-minutes: ${JWT_ACCESS_MINUTES:15}
+    refresh-days: ${JWT_REFRESH_DAYS:14}
+  frontend:
+    base-url: ${FRONTEND_BASE_URL:http://localhost:5173}
+  email:
+    verification-ttl-hours: ${EMAIL_VERIFY_TTL_HOURS:48}
+  cors:
+    # Comma-separated; patterns in SecurityConfig also allow http://localhost:* (any port) for credentialed requests
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost,http://127.0.0.1}
+  api:
+    version-prefix: /api/v1
+  bootstrap:
+    admin-email: ${ADMIN_EMAIL:admin@peerlending.local}
+    admin-password: ${ADMIN_PASSWORD:Admin123!}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

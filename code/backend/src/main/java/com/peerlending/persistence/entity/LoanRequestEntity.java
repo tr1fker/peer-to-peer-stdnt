@@ -1,0 +1,55 @@
+package com.peerlending.persistence.entity;
+
+import com.peerlending.domain.LoanRequestStatus;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+
+@Entity
+@Table(name = "loan_requests")
+@Getter
+@Setter
+@NoArgsConstructor
+public class LoanRequestEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "borrower_id")
+    private UserEntity borrower;
+
+    @Column(nullable = false, precision = 14, scale = 2)
+    private BigDecimal amount;
+
+    @Column(name = "term_months", nullable = false)
+    private int termMonths;
+
+    @Column(columnDefinition = "text")
+    private String purpose;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 32)
+    private LoanRequestStatus status;
+
+    @Column(name = "interest_rate_percent", nullable = false, precision = 5, scale = 2)
+    private BigDecimal interestRatePercent;
+
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt = Instant.now();
+}
